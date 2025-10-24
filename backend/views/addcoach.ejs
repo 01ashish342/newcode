@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+.close-btn {
+  position: absolute;
+  top: 15px;
+  left: 20px;  /* 👈 top-left corner */
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.close-btn:hover {
+  color: red;
+  transform: scale(1.1);
+}
+</style>
+  <meta charset="UTF-8">
+  <title>Add Coach</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-dark">
+
+  <div class="container d-flex justify-content-center align-items-center" style="min-height:100vh;">
+   
+    <div class="card shadow-lg p-4 bg-dark-subtle text-black" style="width: 28rem; border-radius: 15px;">
+    <button class="close-btn" onclick="window.location.href='/home'">×</button>
+      <h2 class="text-center mb-4 text-primary">Add New Coach</h2>
+
+      <form action="/addcoach" method="POST" enctype="multipart/form-data">
+        <!-- Name -->
+<div class="mb-3">
+ <label for="coachImage">Upload Photo:</label>
+  <input type="file" name="coachImage" id="coachImage">
+
+</div>
+
+
+        <div class="mb-3">
+          <label class="form-label">Coach Name</label>
+          <input type="text" name="name" class="form-control" placeholder="Enter coach name" required>
+        </div>
+
+        <!-- Experience -->
+        <div class="mb-3">
+          <label class="form-label">Experience (Years)</label>
+          <input type="number" name="experience" class="form-control" placeholder="Enter years of experience" required>
+        </div>
+
+        <!-- Team -->
+        <div class="mb-3">
+          <label class="form-label">Team</label>
+          <input type="text" name="team" class="form-control" placeholder="Enter team name" required>
+        </div>
+
+        <!-- Sport -->
+        <div class="mb-3">
+          <label class="form-label">sport</label>
+          <select name="sport" class="form-select" required>
+            <option value="" disabled selected>Select sport</option>
+            <option value="cricket">Cricket</option>
+            <option value="football">Football</option>
+          </select>
+        </div>
+
+        <!-- Button -->
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary btn-lg">Save Coach</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

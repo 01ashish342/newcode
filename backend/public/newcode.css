@@ -1,0 +1,90 @@
+.card
+{
+    text-align: center;
+    justify-content:center;
+display: flex;
+flex-wrap: wrap;
+margin: 30px;
+}
+
+
+.myclass
+{
+    display: flex;
+    justify-content:center;
+    flex-wrap: wrap;
+    margin: 30px;
+}
+.loginform
+{
+    justify-content: center;
+    background-color: rgb(252, 240, 255);
+    margin-top: 200px;
+    margin-left: 400px;
+    margin-right: 400px;
+    margin-bottom: 100px;
+}
+.loginbody
+{
+background-color:azure;
+}
+.close
+{
+    text-align: end;
+    margin-bottom: 0px;
+}
+.d-flex
+{
+
+    margin-left: 600px;
+}
+.signupbody
+{
+    margin-top: 195px;
+    margin-left: 400px;
+    margin-right: 400px;
+    margin-bottom: 100px;
+    background-color:lightcyan;
+    color:black;
+}
+.col-12
+{
+    text-align: center;
+}
+.form-check
+{
+    margin-right: 230px;
+}
+.container
+{
+    border:2px solid gray;
+    border-radius: 5px;
+    
+ 
+
+}
+
+  .homebody{
+    background-color:slategray;
+  }
+/* Example media query */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  .card {
+    margin-bottom: 20px;
+  }
+}
+
+/* .nav
+{
+  width: 1000px;
+  
+} */
+
+.searchbody{
+    background-color:slategray;
+  }
+
+ 

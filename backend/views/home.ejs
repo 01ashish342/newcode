@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>new code</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/newcode.css">
+    <style>
+    
+  .navbar {
+    padding-top: 1rem;   /* increase top padding */
+    padding-bottom: 1rem; /* increase bottom padding */
+  }
+
+  .navbar .nav-link, 
+  .navbar .navbar-brand {
+    padding-top: 0.8rem;  /* adjust link padding */
+    padding-bottom: 0.8rem;
+    font-size: 1.1rem;    /* optional: slightly bigger text */
+  }
+</style
+
+
+</head>
+<body class="homebody" >
+<nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-body" >
+  <div class="container-fluid" >
+
+    <!-- Brand -->
+    <a class="navbar-brand" href="#">Home</a>
+
+    <!-- Toggler -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapse -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      
+      <!-- Left Links -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <% if (!curruser) { %>
+          <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="/signup">Signup</a></li>
+        <% } %>
+        
+        <li class="nav-item dropdown" class="bg-dark">
+          <a class="nav-link dropdown-toggle" href="" role="button" data-bs-toggle="dropdown">Profession</a>
+        
+          <ul class="dropdown-menu" >
+            <li><a class="dropdown-item" href="/search?q=cricket"  >Cricket</a></li>
+            <li><a class="dropdown-item" href="search?q=Hockey">Hockey</a></li>
+            <li><a class="dropdown-item" href="search?q=Badminton">Badminton</a></li>
+            <li><a class="dropdown-item" href="search?q=football">Football</a></li>
+            <li><a class="dropdown-item" href="search?q=Table-tennis">Table-tennis</a></li>
+            <li><a class="dropdown-item" href="search?q=chess">Chess</a></li>
+            
+          </ul>
+          
+          
+        </li>
+   
+        <li class="nav-item"><a class="nav-link disabled">Disabled</a></li>
+        <% if (curruser) { %>
+          <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+        <% } %>
+      </ul>
+
+      <!-- Search (only on large screens) -->
+     <form class="d-flex mx-auto d-none d-lg-flex w-50 flex-nowrap" role="search" method="get" action="/search"> <input name="q" class="form-control me-2" type="search" placeholder="Search" aria-label="Search"> <button class="btn btn-outline-success" type="submit">Search</button> </form>
+
+
+      <!-- Profile aligned right -->
+      <a class="btn btn-outline-light rounded-pill px-4 ms-auto" href="/myprofile">My Profile</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Search (only on mobile, full width below navbar) -->
+<div class="container-fluid bg-dark py-2 d-lg-none">
+  <form class="d-flex mx-auto" style="max-width: 400px;" role="search" method="get" action="/search">
+    <input name="q" class="form-control me-2" type="search" placeholder="Search">
+    <button class="btn btn-success" type="submit">Search</button>
+  </form>
+</div>
+
+
+
+
+
+
+
+
+
+
+    <% if (success && success.length > 0) { %>
+    <div class="alert-danger"><%= success %></div>
+  <% } %>
+   
+<br>
+
+    <!-- Results -->
+  <div class="">
+  <% if (coaches && coaches.length > 0) { %>
+    <div class="row g-3">
+      <% coaches.forEach(coach => { %>
+        <div class="col-md-4">
+  <div class="card shadow-lg border-0 rounded-4 h-100 bg-dark text-white">
+    <div class="card-body text-center">
+      <img src="<%=coach.coachImage %>" 
+     alt="Coach Image" 
+     class="img-fluid rounded mb-3"
+     style="height: 200px; width: 100%; object-fit: cover;">
+
+              <h5 class="card-title text-primary fw-bold"><%= coach.name %></h5>
+              <p class="card-text mb-2"><strong>Experience:</strong> <%= coach.experience %> years</p>
+              <p class="card-text mb-4"><strong>Team:</strong> <%= coach.team %></p>
+              <p class="card-text mb-4"><strong>sport:</strong> <%= coach.sport %></p>
+           
+              <a href="/viewcoach/<%=coach._id %>"class="btn btn-outline-primary btn-sm rounded-pill px-3">View</a>
+              <% if(curruser && curruser._id.equals(coach.owner)){ %>
+
+              <a href="/editcoach/<%=coach._id%>" class="btn btn-outline-warning btn-sm rounded-pill px-3">Edit</a>
+            <%}%>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="alert alert-warning text-center mt-5">No coaches found. </div>
+  <% } %>
+</div>
+
+
+<br>
+
+<br>
+
+
+</div>
+</div>
+<!-- Footer -->
+<!-- Footer -->
+<footer  class="bg-black text-white pt-5 pb-3 mt-auto border-top" class=" footer">
+  <div class="container">
+    <div class="row">
+      
+      <!-- About -->
+      <div class="col-md-4 mb-3">
+        <h5>About Us</h5>
+        <p class="small">
+          This is a sports platform where players and coaches connect, explore opportunities, and grow together.
+        </p>
+      </div>
+
+      <!-- Quick Links -->
+      <!-- Social Links -->
+<div class="col-md-4 mb-3 text-center">
+  <h5>Follow Us</h5>
+  <a href="https://www.facebook.com" target="_blank" class="text-light me-3 fs-4">
+    <i class="bi bi-facebook"></i>
+  </a>
+  <a href="https://www.twitter.com" target="_blank" class="text-light me-3 fs-4">
+    <i class="bi bi-twitter"></i>
+  </a>
+  <a href="https://www.instagram.com" target="_blank" class="text-light fs-4">
+    <i class="bi bi-instagram"></i>
+  </a>
+</div>
+
+
+      <!-- Contact -->
+      <div class="col-md-4 mb-3">
+        <h5>Contact</h5>
+        <p class="small mb-1">📍 Varanasi, India</p>
+        <p class="small mb-1">📧 support@sportsapp.com</p>
+        <p class="small">📞 +91 98765 43210</p>
+      </div>
+    </div>
+
+    <!-- Bottom -->
+    <div class="text-center border-top pt-3 mt-3">
+      <p class="mb-0 small">&copy; 2025 Sports App. All Rights Reserved.</p>
+    </div>
+  </div>
+</footer>
+
+
+
+
+
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
+      function goToSearch(event) {
+    event.preventDefault(); // prevent default form submission
+    const query = document.getElementById('searchInput').value.trim();
+    if(query) {
+      window.location.href = `/search?q=${encodeURIComponent(query)}`;
+    }
+  }
+     </script>
+     
+</body>
+</html>
