@@ -151,7 +151,7 @@ app.get("/logout", (req,res,next) => {
 });
 
 // --- Home / Coaches ---
-app.get("/home", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
     const coaches = await Coach.find({});
     res.render("home.ejs", { coaches });
