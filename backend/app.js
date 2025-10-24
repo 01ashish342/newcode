@@ -25,8 +25,14 @@ const ExpressError = require("./utils/ExpressError.js");
 const http = require("http");
 const { Server } = require("socket.io");
 const server = http.createServer(app);
-const io = new Server(server);
+// const io = new Server(server);
 
+const io = new Server(server, {
+  cors: {
+    origin: "*", // change later to your frontend Render URL
+    methods: ["GET", "POST"],
+  },
+});
 const Razorpay = require("razorpay");
 
 // =================== Cloudinary Config ===================
@@ -90,7 +96,7 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 // =================== DB Connection ===================
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 main()
   .then(() => console.log("Connected to database"))
@@ -477,4 +483,7 @@ app.use((err,req,res,next)=>{
 });
 
 // =================== Start Server ===================
+
+
+
 server.listen(port,()=>console.log(`Server running on port ${port}`));
