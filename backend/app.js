@@ -110,6 +110,10 @@ app.use((req, res, next) => {
 
 // =================== Routes ===================
 
+app.get("/", (req, res) => {
+  res.redirect("/home");
+});
+
 // --- Signup ---
 app.get("/signup", (req,res) => res.render("basicsignup.ejs"));
 app.get("/signup/player", (req, res) => res.render("signup.ejs"));
@@ -151,7 +155,7 @@ app.get("/logout", (req,res,next) => {
 });
 
 // --- Home / Coaches ---
-app.get("/", async (req, res) => {
+app.get("/home", async (req, res) => {
   try {
     const coaches = await Coach.find({});
     res.render("home.ejs", { coaches });
