@@ -339,27 +339,35 @@ app.post("/accept/:id", async (req,res) => {
 });
 
 // --- Video Calls ---
-io.on("connection",(socket)=>{
+// --- Video Calls ---
+io.on("connection", (socket) => {
   console.log("User connected");
 
-  socket.on("ready",({ appointmentId })=>{
+  // When a user is ready, join the room and notify others
+  socket.on("ready", ({ appointmentId }) => {
     socket.join(appointmentId);
+    // Notify all other users in the room that someone is ready
+    socket.to(appointmentId).emit("ready");
   });
 
-  socket.on("offer",({ appointmentId, offer })=>{
-    socket.to(appointmentId).emit("offer",{ offer });
+  // Offer sent by initiator
+  socket.on("offer", ({ appointmentId, offer }) => {
+    socket.to(appointmentId).emit("offer", { offer });
   });
 
-  socket.on("answer",({ appointmentId, answer })=>{
-    socket.to(appointmentId).emit("answer",{ answer });
+  // Answer sent by responder
+  socket.on("answer", ({ appointmentId, answer }) => {
+    socket.to(appointmentId).emit("answer", { answer });
   });
 
-  socket.on("ice-candidate",({ appointmentId, candidate })=>{
-    socket.to(appointmentId).emit("ice-candidate",{ candidate });
+  // ICE candidates
+  socket.on("ice-candidate", ({ appointmentId, candidate }) => {
+    socket.to(appointmentId).emit("ice-candidate", { candidate });
   });
 
-  socket.on("disconnect",()=>console.log("User disconnected"));
+  socket.on("disconnect", () => console.log("User disconnected"));
 });
+
 
 app.get("/videocall/:id", isLoggedIn, async (req,res)=>{
   try {

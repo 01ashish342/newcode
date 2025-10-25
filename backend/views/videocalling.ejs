@@ -16,12 +16,7 @@
       min-height: 100vh;
       padding: 20px;
     }
-
-    h2 {
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
+    h2 { margin-bottom: 20px; text-align: center; }
     .videos {
       display: flex;
       flex-direction: column;
@@ -30,7 +25,6 @@
       width: 100%;
       max-width: 800px;
     }
-
     video {
       border-radius: 12px;
       border: 2px solid #333;
@@ -39,7 +33,6 @@
       height: auto;
       background: #000;
     }
-
     .controls {
       margin-top: 15px;
       display: flex;
@@ -47,14 +40,7 @@
       flex-wrap: wrap;
       justify-content: center;
     }
-
-    .controls button {
-      border-radius: 50px;
-      padding: 10px 20px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
+    .controls button { border-radius: 50px; padding: 10px 20px; font-size: 1rem; cursor: pointer; }
     .btn-mute { background: #dc3545; color: #fff; }
     .btn-video { background: #007bff; color: #fff; }
     .btn-end { background: #6c757d; color: #fff; }
@@ -76,62 +62,67 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
+    const appointmentId = "<%= appointment._id %>";
+    const socket = io("https://Coachfinder.onrender.com", { transports: ["websocket"] });
+
     const localVideo = document.getElementById("localVideo");
     const remoteVideo = document.getElementById("remoteVideo");
     const toggleAudioBtn = document.getElementById("toggleAudio");
     const toggleVideoBtn = document.getElementById("toggleVideo");
     const endCallBtn = document.getElementById("endCall");
 
-    const socket = io();
     let localStream;
     let peerConnection;
-    const config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
-    const appointmentId = "<%= appointment._id %>";
+    let isInitiator = false;
+
+    const config = {
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" } // Free STUN server
+      ]
+    };
 
     async function startCall() {
-      try {
-        // HD video + audio
-        localStream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 1280, height: 720 },
-          audio: true
-        });
-        localVideo.srcObject = localStream;
+      // Get user media
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      localVideo.srcObject = localStream;
 
-        peerConnection = new RTCPeerConnection(config);
+      // Create RTCPeerConnection
+      peerConnection = new RTCPeerConnection(config);
 
-        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+      // Add tracks
+      localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
-        peerConnection.ontrack = (event) => {
-          remoteVideo.srcObject = event.streams[0];
-        };
+      // Receive remote track
+      peerConnection.ontrack = (event) => {
+        remoteVideo.srcObject = event.streams[0];
+      };
 
-        peerConnection.onicecandidate = (event) => {
-          if (event.candidate) {
-            socket.emit("ice-candidate", { candidate: event.candidate, appointmentId });
-          }
-        };
+      // ICE candidates
+      peerConnection.onicecandidate = (event) => {
+        if(event.candidate){
+          socket.emit("ice-candidate", { appointmentId, candidate: event.candidate });
+        }
+      };
 
-        // Notify server ready
-        socket.emit("ready", { appointmentId });
-
-      } catch (err) {
-        alert("Camera/Microphone access denied or error: " + err.message);
-      }
+      // Notify backend ready
+      socket.emit("ready", { appointmentId });
     }
 
-    startCall(); // start automatically, can also trigger on button click
+    startCall();
 
     // Zoom-like controls
     toggleAudioBtn.onclick = () => {
       if (!localStream) return;
-      localStream.getAudioTracks()[0].enabled = !localStream.getAudioTracks()[0].enabled;
-      toggleAudioBtn.innerText = localStream.getAudioTracks()[0].enabled ? "Mute" : "Unmute";
+      const enabled = !localStream.getAudioTracks()[0].enabled;
+      localStream.getAudioTracks()[0].enabled = enabled;
+      toggleAudioBtn.innerText = enabled ? "Mute" : "Unmute";
     };
 
     toggleVideoBtn.onclick = () => {
       if (!localStream) return;
-      localStream.getVideoTracks()[0].enabled = !localStream.getVideoTracks()[0].enabled;
-      toggleVideoBtn.innerText = localStream.getVideoTracks()[0].enabled ? "Stop Video" : "Start Video";
+      const enabled = !localStream.getVideoTracks()[0].enabled;
+      localStream.getVideoTracks()[0].enabled = enabled;
+      toggleVideoBtn.innerText = enabled ? "Stop Video" : "Start Video";
     };
 
     endCallBtn.onclick = () => {
@@ -140,28 +131,36 @@
       window.location.href = "/home";
     };
 
-    // Listen for offers
-    socket.on("offer", async (data) => {
+    // ----- Socket.IO signaling -----
+    socket.on("ready", async () => {
       if (!peerConnection) return;
-      await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+      if (!isInitiator) {
+        isInitiator = true;
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        socket.emit("offer", { appointmentId, offer });
+      }
+    });
+
+    socket.on("offer", async ({ offer }) => {
+      if (!peerConnection) return;
+      await peerConnection.setRemoteDescription(offer);
       const answer = await peerConnection.createAnswer();
       await peerConnection.setLocalDescription(answer);
-      socket.emit("answer", { answer, appointmentId });
+      socket.emit("answer", { appointmentId, answer });
     });
 
-    // Listen for answers
-    socket.on("answer", async (data) => {
+    socket.on("answer", async ({ answer }) => {
       if (!peerConnection) return;
-      await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+      await peerConnection.setRemoteDescription(answer);
     });
 
-    // Listen for ICE candidates
-    socket.on("ice-candidate", async (data) => {
+    socket.on("ice-candidate", async ({ candidate }) => {
+      if (!peerConnection) return;
       try {
-        if (!peerConnection) return;
-        await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-      } catch (err) {
-        console.error("Error adding received ice candidate", err);
+        await peerConnection.addIceCandidate(candidate);
+      } catch(err) {
+        console.error("Error adding ICE candidate:", err);
       }
     });
   </script>
